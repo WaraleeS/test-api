@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -82,26 +81,20 @@ func main() {
 
 	e.POST("/articles", func(c echo.Context) error {
 		article := Article{}
-		maxKeyID := 0
+		max := 0
 		err := c.Bind(&article)
 		if err != nil {
 			return err
 		}
 		for key := range articles {
-			if key > maxKeyID {
-				maxKeyID = key
+			if key > max {
+				max = key
 			}
 		}
-		nextKeyID := maxKeyID + 1
-		article.ID = nextKeyID
-		articles[nextKeyID] = article
+		nextKey := max + 1
+		article.ID = nextKey
+		articles[nextKey] = article
 
-		article = Article{
-			ID:      nextKeyID,
-			Title:   "Italy",
-			Content: "This is Italy content",
-			User_ID: "44444",
-		}
 		return c.JSON(http.StatusOK, article)
 	})
 	e.POST("/articles/:id", func(c echo.Context) error {
@@ -114,7 +107,13 @@ func main() {
 		return c.JSON(http.StatusOK, article)
 	})
 	e.DELETE("/articles/:id", func(c echo.Context) error {
-		return c.String(http.StatusOK, fmt.Sprintf("update article"))
+		id := c.Param("id")
+		intID, err := strconv.Atoi(id)
+		if err != nil {
+			return c.JSON(http.StatusOK, map[string]interface{}{"message": "sorry girl, Error Response"})
+		}
+		delete(articles, intID)
+		return c.JSON(http.StatusOK, map[string]interface{}{"message": "article deleted!"})
 	})
 
 	e.Logger.Fatal(e.Start(":1234"))
