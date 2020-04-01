@@ -63,20 +63,19 @@ func main() {
 			listArticle = append(listArticle, val)
 		}
 		return c.JSON(http.StatusOK, listArticle)
-
 	})
 
 	e.GET("/articles/:id", func(c echo.Context) error {
 		id := c.Param("id")
 		intID, err := strconv.Atoi(id)
 		if err != nil {
-			return c.JSON(http.StatusOK, map[string]interface{}{"message": "sorry girl, Error Response"})
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "sorry girl, Error Response"})
 		}
-		listArticle, true := articles[intID]
+		article, true := articles[intID]
 		if !true {
-			return c.JSON(http.StatusOK, map[string]interface{}{"message": "sorry girl, Error Response"})
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "sorry girl, Error Response"})
 		}
-		return c.JSON(http.StatusOK, listArticle)
+		return c.JSON(http.StatusOK, article)
 	})
 
 	e.POST("/articles", func(c echo.Context) error {
@@ -110,7 +109,7 @@ func main() {
 		id := c.Param("id")
 		intID, err := strconv.Atoi(id)
 		if err != nil {
-			return c.JSON(http.StatusOK, map[string]interface{}{"message": "sorry girl, Error Response"})
+			return c.JSON(http.StatusBadRequest, map[string]interface{}{"message": "sorry girl, Error Response"})
 		}
 		delete(articles, intID)
 		return c.JSON(http.StatusOK, map[string]interface{}{"message": "article deleted!"})
